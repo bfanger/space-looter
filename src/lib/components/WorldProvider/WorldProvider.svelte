@@ -1,0 +1,28 @@
+<script lang="ts">
+  import { setContext } from "svelte";
+  import type { Cell, World } from "../../services/world-fns";
+
+  const width = 50;
+  const height = 40;
+
+  const world: World = setContext(
+    "world",
+    Object.assign(new EventTarget(), {
+      width,
+      height,
+      grid: new Array(width).fill(null).map(() =>
+        new Array(height).fill(null).map(() => {
+          const cell: Cell = {
+            type: Math.random() < 0.05 ? "zaad" : "empty",
+            counter: 0,
+            energy: Math.random() * 4,
+          };
+          return cell;
+        })
+      ),
+    })
+  );
+  console.info("🌎 Rebuilding world");
+</script>
+
+<slot />

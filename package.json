@@ -1,0 +1,69 @@
+{
+  "name": "svelte-project-template",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "concurrently -c \"#c596c7\",\"#676778\",\"#4b32c3\",\"#fafafa\" --kill-others-on-fail \"npm:lint:*\"",
+    "lint:prettier": "prettier --check --loglevel=warn . \"src/**/*.svelte\"",
+    "lint:svelte-check": "svelte-check --fail-on-warnings --ignore build,package",
+    "lint:eslint": "eslint --ext=js,ts,svelte --max-warnings=0 src",
+    "lint:stylelint": "stylelint \"src/**/*.{css,scss,svelte}\"",
+    "format": "prettier --write  . \"src/**/*.svelte\" && stylelint --fix \"src/**/*.{css,scss,svelte}\" && eslint --ext=js,ts,svelte --fix src",
+    "prepare": "husky install",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "lint-staged": {
+    "*.{ts,svelte}": [
+      "eslint --max-warnings 0 --no-ignore",
+      "svelte-check --fail-on-warnings"
+    ],
+    "*.(c)?js": [
+      "eslint --max-warnings 0 --no-ignore"
+    ],
+    "*.{css,scss,json,html}": [
+      "prettier --check"
+    ]
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^2.0.2",
+    "@sveltejs/kit": "^1.15.8",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.39.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-triple": "^0.5.8",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-only-warn": "^1.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.1",
+    "postcss": "^8.4.23",
+    "postcss-html": "^1.5.0",
+    "postcss-preset-env": "^8.3.2",
+    "prettier": "^2.8.8",
+    "prettier-plugin-svelte": "^2.10.0",
+    "sass": "^1.62.0",
+    "stylelint": "^15.6.0",
+    "stylelint-config-clean-order": "^5.0.1",
+    "stylelint-config-standard-scss": "^9.0.0",
+    "stylelint-prettier": "^3.0.0",
+    "svelte": "^3.58.0",
+    "svelte-check": "^3.2.0",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.2"
+  },
+  "dependencies": {
+    "pixi.js": "^7.2.4"
+  }
+}
