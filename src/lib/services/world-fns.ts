@@ -31,7 +31,7 @@ export type World = EventTarget & {
 
 export function forEachCell(
   world: World,
-  fn: (cell: Cell, x: number, y: number) => void
+  fn: (cell: Cell, x: number, y: number) => void,
 ) {
   for (let x = 0; x < world.width; x += 1) {
     for (let y = 0; y < world.height; y += 1) {

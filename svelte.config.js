@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
 import adapter from "@sveltejs/adapter-static";
-import { vitePreprocess } from "@sveltejs/kit/vite";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 /** @type {import('@sveltejs/kit').Config} */
 export default {
@@ -9,9 +9,5 @@ export default {
     adapter: adapter(),
     version: { name: execSync("git rev-parse HEAD || date").toString().trim() },
   },
-  vitePlugin: {
-    experimental: {
-      inspector: { holdMode: true },
-    },
-  },
+  vitePlugin: { inspector: { holdMode: true } },
 };

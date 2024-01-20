@@ -2,11 +2,9 @@
   "extends": ["triple/svelte"],
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
   },
-  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.eslint.json",
-    "extraFileExtensions": [".cjs", ".svelte"]
-  }
+  },
 }

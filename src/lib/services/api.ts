@@ -1,38 +1,31 @@
 /**
  * Typed api wrapper with injectable fetch for SSR
  *
- * The responses of the api methods contain the data directly but also have a hidden property.
- * This allows access to the headers and http status of the response using the helper methods.
+ * The responses of the api methods contain the data directly.
+ * The corresponding Response object is available via the helper methods via lookup.
+ * This allows access to the headers and http status code by passing the data to those helpers
  */
-import { error, type HttpError } from "@sveltejs/kit";
-import buildUrl from "./buildUrl";
+import { error, type NumericRange } from "@sveltejs/kit";
+import buildUrl, { type Params } from "./buildUrl";
 import type {
   ApiGetResponse,
   ApiPostRequest,
   ApiPostResponse,
-} from "./api-types-jsonplaceholder";
-import { env } from "$env/dynamic/public";
+} from "./api-types";
 
-const endpoint =
-  env.PUBLIC_API_ENDPOINT ?? "https://jsonplaceholder.typicode.com/";
-
-export type Fetch = (
-  info: RequestInfo,
-  init?: RequestInit
-) => Promise<Response>;
+const endpoint = "https://jsonplaceholder.typicode.com/";
 
 type Config = RequestInit & {
-  params?: Record<string, string | number>;
-  fetch?: Fetch;
+  params?: Params;
+  fetch?: typeof fetch;
   ssrCache?: number;
 };
-const responseSymbol = Symbol("response");
-type ApiResponse<T = unknown> = T & { [responseSymbol]: Response };
+const responses = new WeakMap<any, Response>();
 
 async function wrapped(
   method: RequestInit["method"],
   path: string,
-  config: Config
+  config: Config,
 ): Promise<any> {
   // eslint-disable-next-line prefer-const
   let { ssrCache, fetch, params, ...init } = config;
@@ -62,29 +55,37 @@ async function wrapped(
   const duration = (Date.now() - start) / 1000;
   if (duration > 1) {
     console.info(
-      `${method} ${url.substring(endpoint.length)} took ${duration.toFixed(3)}s`
+      `${method} ${url.substring(endpoint.length)} took ${duration.toFixed(
+        3,
+      )}s`,
     );
   }
   if (!response.ok) {
-    const err = error(
-      response.status,
-      `${method} ${url} failed: ${response.status} ${response.statusText}`
-    ) as ApiResponse<HttpError>;
-    err[responseSymbol] = response;
-    // eslint-disable-next-line @typescript-eslint/no-throw-literal
+    try {
+      error(
+        response.status as NumericRange<400, 599>,
+        `${method} ${url} failed: ${response.status} ${response.statusText}`,
+      );
+    } catch (err) {
+      responses.set(err, response);
+      throw err;
+    }
+  }
+
+  // Note: If the api is allowed to return empty or non-json content, this check should be tweaked or removed.
+  if (!response.headers.get("Content-Type")?.startsWith("application/json")) {
+    const err = new Error(
+      `${method} ${url} failed: Missing 'Content-Type: application/json' header`,
+    );
+    responses.set(err, response);
     throw err;
   }
-  let data = {
-    __: "Missing `Content-Type: application/json`",
-  } as ApiResponse<any>;
-  if (response.headers.get("Content-Type")?.startsWith("application/json")) {
-    data = await response.json();
-  }
+  const data = await response.json();
   if (config.signal && config.signal.aborted) {
     throw new Error("Aborted");
   }
   if (typeof data === "object" && data !== null) {
-    data[responseSymbol] = response;
+    responses.set(data, response);
   }
   return data;
 }
@@ -92,15 +93,15 @@ async function wrapped(
 const api = {
   get<T extends keyof ApiGetResponse>(
     path: T,
-    config?: Config
-  ): Promise<ApiResponse<ApiGetResponse[T]>> {
+    config?: Config,
+  ): Promise<ApiGetResponse[T]> {
     return wrapped("GET", path, config || {});
   },
   async post<T extends keyof ApiPostRequest & keyof ApiPostResponse>(
     path: T,
     data: ApiPostRequest[T],
-    config?: Config
-  ): Promise<ApiResponse<ApiPostResponse[T]>> {
+    config?: Config,
+  ): Promise<ApiPostResponse[T]> {
     return wrapped("POST", path, {
       ...config,
       headers: {
@@ -113,16 +114,11 @@ const api = {
 };
 export default api;
 
-function getResponse(dataOrError: ApiResponse | unknown): Response | undefined {
-  if (typeof dataOrError === "object" && dataOrError !== null) {
-    return (dataOrError as any)[responseSymbol];
-  }
-  return undefined;
+function getResponse(dataOrError: unknown): Response | undefined {
+  return responses.get(dataOrError);
 }
 
-export function getStatus(
-  dataOrError: ApiResponse | unknown
-): number | undefined {
+export function getStatus(dataOrError: unknown): number | undefined {
   const response = getResponse(dataOrError);
   if (response) {
     return response.status;
@@ -130,9 +126,7 @@ export function getStatus(
   return undefined;
 }
 
-export function getStatusText(
-  dataOrError: ApiResponse | unknown
-): string | undefined {
+export function getStatusText(dataOrError: unknown): string | undefined {
   const response = getResponse(dataOrError);
   if (response) {
     return response.statusText;
@@ -141,8 +135,8 @@ export function getStatusText(
 }
 
 export function getHeader(
-  dataOrError: ApiResponse | unknown,
-  name: string
+  dataOrError: unknown,
+  name: string,
 ): string | undefined {
   const response = getResponse(dataOrError);
   if (response) {

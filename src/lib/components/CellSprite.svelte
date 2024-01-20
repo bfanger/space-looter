@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { CellType } from "$lib/services/world-fns";
   import { Application, SCALE_MODES, Sprite, Texture } from "pixi.js";
   import { getContext, onMount } from "svelte";
+  import type { CellType } from "$lib/services/world-fns";
 
   export let x: number;
   export let y: number;

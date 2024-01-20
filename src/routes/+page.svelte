@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { getContext, onMount } from "svelte";
   import Canvas from "$lib/components/Canvas/Canvas.svelte";
   import { randomize, tick, type World } from "$lib/services/world-fns";
-  import { getContext, onMount } from "svelte";
 
   const world = getContext<World>("world");
   onMount(() => {

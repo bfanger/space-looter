@@ -11,7 +11,7 @@
       height: world.height * 14,
       resolution: 2,
       autoDensity: true,
-    })
+    }),
   );
   /* eslint-disable no-underscore-dangle */
   (window as any).__PIXI_APP__ = app;

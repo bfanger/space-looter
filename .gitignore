@@ -6,4 +6,5 @@ node_modules
 /functions
 /storybook-static
 /test-results
+/vite.config.ts.timestamp-*.mjs
 .env

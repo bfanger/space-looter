@@ -1,11 +1,11 @@
 <script lang="ts">
   import { setContext } from "svelte";
-  import type { Cell, World } from "../../services/world-fns";
+  import type { Cell } from "../../services/world-fns";
 
   const width = 50;
   const height = 40;
 
-  const world: World = setContext(
+  setContext(
     "world",
     Object.assign(new EventTarget(), {
       width,
@@ -18,9 +18,9 @@
             energy: Math.random() * 4,
           };
           return cell;
-        })
+        }),
       ),
-    })
+    }),
   );
   console.info("🌎 Rebuilding world");
 </script>

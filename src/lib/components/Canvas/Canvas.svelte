@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { World } from "$lib/services/world-fns";
   import type { Application } from "pixi.js";
   import { getContext, onMount } from "svelte";
   import Cell from "../CellSprite.svelte";
+  import type { World } from "$lib/services/world-fns";
 
   const app = getContext<Application>("app");
   const world = getContext<World>("world");
