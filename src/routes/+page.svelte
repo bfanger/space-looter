@@ -1,25 +1,17 @@
 <script lang="ts">
-  import { getContext, onMount } from "svelte";
-  import Canvas from "$lib/components/Canvas/Canvas.svelte";
-  import { randomize, tick, type World } from "$lib/services/world-fns";
+  import type { Body } from "matter-js";
+  import DebugRender from "$lib/components/DebugRender.svelte";
+  import Player from "$lib/components/Player.svelte";
+  import World from "$lib/components/World.svelte";
+  import SpaceShip from "$lib/components/SpaceShip.svelte";
+  import Scrap from "$lib/components/Scrap.svelte";
 
-  const world = getContext<World>("world");
-  onMount(() => {
-    setInterval(() => {
-      tick(world);
-    }, 1000);
-  });
+  let player: Body;
 </script>
 
-<svelte:head>
-  <title>Evolve</title>
-</svelte:head>
-
-<Canvas />
-<button on:click={() => tick(world)}>Tick</button>
-<button
-  on:click={() => {
-    randomize(world);
-    tick(world);
-  }}>Randomize</button
->
+<World>
+  <Player bind:body={player} />
+  <SpaceShip />
+  <DebugRender lookAt={player} />
+  <Scrap {player} />
+</World>
