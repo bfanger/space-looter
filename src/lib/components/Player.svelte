@@ -1,26 +1,34 @@
 <script lang="ts">
   import { Bodies, Body } from "matter-js";
-  import { onEngineBeforeUpdate, worldAdd } from "$lib/services/matter-fns";
+  import {
+    onMatterEvent,
+    mountMatter,
+    getMatterContext,
+  } from "$lib/services/matter-fns";
   import joystick from "$lib/services/joystick";
+
+  const { engine, player } = getMatterContext();
 
   const maxSpeed = 4;
   const force = 0.05;
-
-  export const body = Bodies.rectangle(400, 200, 80, 80, {
+  const body = Bodies.rectangle(600, 500, 80, 80, {
     label: "player",
     frictionAir: 0.05,
     mass: 50,
     render: {
-      opacity: 1,
-      strokeStyle: "white",
-      fillStyle: "#00ff00",
-      lineWidth: 3,
+      sprite: {
+        texture: "/img/player-frame.png",
+        xScale: 3.5,
+        yScale: 3.5,
+      },
     },
   });
 
-  worldAdd(body);
+  player.set(body);
 
-  onEngineBeforeUpdate(() => {
+  mountMatter(body);
+
+  onMatterEvent(engine, "beforeUpdate", () => {
     if ($joystick.up) {
       body.force.y = -force;
     }

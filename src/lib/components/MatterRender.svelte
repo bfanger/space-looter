@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Body, Events, Render } from "matter-js";
+  import { Events, Render } from "matter-js";
   import { getMatterContext } from "$lib/services/matter-fns";
 
-  export let lookAt: Body | undefined = undefined;
+  export let followPlayer = false;
 
-  const { engine } = getMatterContext();
+  const { engine, player } = getMatterContext();
 
   function mount(canvas: HTMLCanvasElement) {
     const render = Render.create({
@@ -18,8 +18,8 @@
     });
 
     function afterUpdate() {
-      if (lookAt) {
-        Render.lookAt(render, lookAt, {
+      if (followPlayer) {
+        Render.lookAt(render, $player, {
           x: 640 / 2,
           y: 480 / 2,
         });

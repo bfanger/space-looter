@@ -1,27 +1,36 @@
 <script lang="ts">
-  import { Bodies, Body, Detector } from "matter-js";
-  import { onEngineAfterUpdate, worldAdd } from "$lib/services/matter-fns";
+  import { Bodies, Detector, type IBodyRenderOptionsSprite } from "matter-js";
+  import {
+    getMatterContext,
+    mountMatter,
+    onMatterEvent,
+  } from "$lib/services/matter-fns";
 
-  export let player: Body | undefined;
+  let active = false;
 
   const body = Bodies.rectangle(250, 150, 50, 50, {
     label: "scrap",
-    mass: 10,
     isSensor: true,
-    render: { fillStyle: "gold", strokeStyle: "white", lineWidth: 3 },
+    render: { sprite: { texture: "/img/scrap-1.png", xScale: 4, yScale: 4 } },
   });
+  const sprite = body.render.sprite as IBodyRenderOptionsSprite;
 
-  const detector = Detector.create({ bodies: [body] });
+  $: sprite.texture = active ? "/img/scrap-2.png" : "/img/scrap-1.png";
 
-  $: if (player) {
-    detector.bodies = [player, body];
-  }
-  onEngineAfterUpdate(() => {
-    if (detector.bodies.length > 0) {
-      Detector.clear(detector);
-      const collisions = Detector.collisions(detector);
-      body.render.fillStyle = collisions.length > 0 ? "blue" : "gold";
+  const { engine, player } = getMatterContext();
+
+  const detector = Detector.create({ bodies: [body, $player] });
+  $: detector.bodies = [body, $player];
+
+  mountMatter([body]);
+  onMatterEvent(engine, "collisionStart", (e) => {
+    if (e.pairs.find((pair) => pair.bodyA === body || pair.bodyB === body)) {
+      active = true;
     }
   });
-  worldAdd(body);
+  onMatterEvent(engine, "collisionEnd", (e) => {
+    if (e.pairs.find((pair) => pair.bodyA === body || pair.bodyB === body)) {
+      active = false;
+    }
+  });
 </script>

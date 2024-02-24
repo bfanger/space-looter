@@ -1,12 +1,15 @@
 <script lang="ts">
-  import { Engine, Runner } from "matter-js";
+  import { Body, Engine, Runner } from "matter-js";
   import { onMount } from "svelte";
+  import { writable } from "svelte/store";
   import { setMatterContext } from "$lib/services/matter-fns";
 
-  const engine = Engine.create({ gravity: { x: 0, y: 0 } });
   const runner = Runner.create();
 
-  setMatterContext({ engine });
+  const { engine } = setMatterContext({
+    engine: Engine.create({ gravity: { x: 0, y: 0 } }),
+    player: writable(Body.create({ label: "placeholder" })),
+  });
 
   onMount(() => {
     Runner.run(runner, engine);

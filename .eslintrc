@@ -7,4 +7,12 @@
   "parserOptions": {
     "project": "./tsconfig.eslint.json",
   },
+  "overrides": [
+    {
+      "files": ["*.svelte"],
+      "rules": {
+        "@typescript-eslint/no-unnecessary-condition": "off",
+      },
+    },
+  ],
 }

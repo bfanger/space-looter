@@ -1,50 +1,49 @@
 import {
   Events,
-  type Engine,
-  type IEngineCallback,
   Composite,
   Body,
+  type Engine,
+  type ICallback,
 } from "matter-js";
 import { getContext, onDestroy, setContext } from "svelte";
+import type { Writable } from "svelte/store";
 
 const key = Symbol("matter-js");
-
 type MatterContext = {
   engine: Engine;
+  player: Writable<Body>;
 };
 
-export function setMatterContext(context: MatterContext) {
-  setContext(key, context);
+export function setMatterContext(context: MatterContext): MatterContext {
+  return setContext(key, context);
 }
 
 export function getMatterContext() {
   const context = getContext<MatterContext | undefined>(key);
   if (!context) {
-    throw new Error("No matter context found");
+    throw new Error("No matter context available");
   }
   return context;
 }
 
-export function onEngineBeforeUpdate(cb: IEngineCallback) {
-  const { engine } = getMatterContext();
-  Events.on(engine, "beforeUpdate", cb);
+export const onMatterEvent: (typeof Events)["on"] = (
+  target: any,
+  event: string,
+  cb: ICallback<any>,
+) => {
+  Events.on(target, event, cb);
   onDestroy(() => {
-    Events.off(engine, "beforeUpdate", cb);
+    Events.off(target, event, cb);
   });
-}
+};
 
-export function onEngineAfterUpdate(cb: IEngineCallback) {
+/**
+ * Inject item(s) into the world and remove them when the svelte component is destroyed
+ */
+export function mountMatter(items: Parameters<typeof Composite.add>[1]) {
   const { engine } = getMatterContext();
-  Events.on(engine, "afterUpdate", cb);
+  Composite.add(engine.world, items);
   onDestroy(() => {
-    Events.off(engine, "afterUpdate", cb);
-  });
-}
-
-export function worldAdd(...bodies: Body[]) {
-  const { engine } = getMatterContext();
-  Composite.add(engine.world, bodies);
-  onDestroy(() => {
-    Composite.remove(engine.world, bodies);
+    Composite.remove(engine.world, items);
   });
 }
