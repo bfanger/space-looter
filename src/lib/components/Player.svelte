@@ -9,11 +9,11 @@
 
   const { engine, player } = getMatterContext();
 
-  const maxSpeed = 4;
-  const force = 0.05;
+  const maxSpeed = 5;
+  const force = 0.2;
   const body = Bodies.rectangle(600, 500, 80, 80, {
     label: "player",
-    frictionAir: 0.05,
+    frictionAir: 0.2,
     mass: 50,
     render: {
       sprite: {
@@ -29,16 +29,16 @@
   mountMatter(body);
 
   onMatterEvent(engine, "beforeUpdate", () => {
-    if ($joystick.up) {
+    if ($joystick.up && !$joystick.down) {
       body.force.y = -force;
     }
-    if ($joystick.down) {
+    if ($joystick.down && !$joystick.up) {
       body.force.y = force;
     }
-    if ($joystick.left) {
+    if ($joystick.left && !$joystick.right) {
       body.force.x = -force;
     }
-    if ($joystick.right) {
+    if ($joystick.right && !$joystick.left) {
       body.force.x = force;
     }
     Body.setAngle(body, 0);
