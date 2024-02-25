@@ -8,15 +8,8 @@
     render: { fillStyle: "brown", strokeStyle: "white", lineWidth: 3 },
   });
 
-  const ground = Bodies.rectangle(400, 610, 810, 60, {
-    isStatic: true,
-    render: { fillStyle: "white" },
-  });
-  const wall = Bodies.rectangle(835, 175, 60, 810, {
-    isStatic: true,
-
-    render: { fillStyle: "white" },
-  });
+  const ground = Bodies.rectangle(315, 480, 640, 10, { isStatic: true });
+  const wall = Bodies.rectangle(640, 235, 10, 480, { isStatic: true });
 
   mountMatter([box, ground, wall]);
 </script>
