@@ -7,8 +7,8 @@
 
   app.ticker.stop();
 
-  onMatterEvent(engine, "afterUpdate", () => {
-    app.ticker.update();
+  onMatterEvent(engine, "afterUpdate", (e) => {
+    app.ticker.update(e.timestamp);
   });
 
   function inject(el: HTMLElement) {

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { SCALE_MODES, Sprite, Texture } from "pixi.js";
   import { onMount } from "svelte";
   import { Bodies, Body } from "matter-js";
   import { getPixiContext } from "$lib/services/pixi-fns";
@@ -9,14 +8,12 @@
     getMatterContext,
   } from "$lib/services/matter-fns";
   import joystick from "$lib/services/joystick";
+  import Aseprite from "$lib/services/Aseprite";
 
   const { engine, player } = getMatterContext();
   const { app } = getPixiContext();
-  const texture = Texture.from("/img/player-frame.png", {
-    scaleMode: SCALE_MODES.NEAREST,
-  });
-
-  const sprite = new Sprite(texture);
+  const sprite = new Aseprite("/img/player.json");
+  sprite.name = "player";
 
   sprite.scale.set(4);
   sprite.anchor.set(0.5, 0.5);
