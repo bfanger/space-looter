@@ -1,14 +1,5 @@
-import {
-  Rectangle,
-  SCALE_MODES,
-  Sprite,
-  Texture,
-  Ticker,
-  UPDATE_PRIORITY,
-} from "pixi.js";
+import { Rectangle, Sprite, Texture, Ticker, UPDATE_PRIORITY } from "pixi.js";
 import type { AsepriteJson } from "./aseprite-types";
-
-const FRAME_TIME = 1000 / 60;
 
 export default class Aseprite extends Sprite {
   private frames: Texture[] | undefined;
@@ -20,12 +11,10 @@ export default class Aseprite extends Sprite {
   private accumulator: number;
 
   constructor(url: string) {
-    super(
-      Texture.from(url.replace(/\.json$/, ".png"), {
-        scaleMode: SCALE_MODES.NEAREST,
-      }),
-    );
-    this.texture.frame = new Rectangle(0, 0, 0, 0);
+    const { source } = Texture.from(url.replace(/\.json$/, ".png"));
+    source.scaleMode = "nearest";
+    super(new Texture({ source, frame: new Rectangle(0, 0, 0, 0) }));
+
     this.currentFrameIndex = 0;
     this.accumulator = 0;
     (async () => {
@@ -38,18 +27,18 @@ export default class Aseprite extends Sprite {
 
       this.frames = data.map(
         ({ frame: { x, y, w, h } }) =>
-          new Texture(this.texture.baseTexture, new Rectangle(x, y, w, h)),
+          new Texture({ source, frame: new Rectangle(x, y, w, h) }),
       );
-      this.durations = data.map((frame) => frame.duration / FRAME_TIME);
+      this.durations = data.map((frame) => frame.duration);
       Ticker.shared.add(this.update, this, UPDATE_PRIORITY.LOW);
     })();
   }
 
-  update(deltaTime: number): void {
+  update(ticker: Ticker): void {
     if (!this.frames || !this.durations) {
       return;
     }
-    this.accumulator += deltaTime;
+    this.accumulator += ticker.deltaMS;
     if (this.accumulator > this.durations[this.currentFrameIndex]) {
       this.accumulator -= this.durations[this.currentFrameIndex];
       this.currentFrameIndex =

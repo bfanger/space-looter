@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Bodies, Detector } from "matter-js";
-  import { SCALE_MODES, Sprite, Texture } from "pixi.js";
+  import { Sprite, Texture } from "pixi.js";
   import {
     getMatterContext,
     mountMatter,
@@ -12,12 +12,10 @@
     label: "scrap",
     isSensor: true,
   });
-  const texture1 = Texture.from("/img/scrap-1.png", {
-    scaleMode: SCALE_MODES.NEAREST,
-  });
-  const texture2 = Texture.from("/img/scrap-2.png", {
-    scaleMode: SCALE_MODES.NEAREST,
-  });
+  const texture1 = Texture.from("/img/scrap-1.png");
+  texture1.source.scaleMode = "nearest";
+  const texture2 = Texture.from("/img/scrap-2.png");
+  texture2.source.scaleMode = "nearest";
 
   const sprite = Sprite.from(texture1);
   sprite.scale.set(4);

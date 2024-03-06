@@ -13,7 +13,7 @@
   const { engine, player } = getMatterContext();
   const { app } = getPixiContext();
   const sprite = new Aseprite("/img/player.json");
-  sprite.name = "player";
+  sprite.label = "player";
 
   sprite.scale.set(4);
   sprite.anchor.set(0.5, 0.5);
